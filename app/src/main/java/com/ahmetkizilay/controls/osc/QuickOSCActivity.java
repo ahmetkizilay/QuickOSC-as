@@ -65,6 +65,8 @@ public class QuickOSCActivity extends FragmentActivity {
     private final static int WIFI_ALERT_DIALOG = 3;
 
     private final static String PROMO_DIALOG = "dlg-promo";
+    private final static String DONATE_DIALOG = "dlg-donate";
+    private final static String THANKS_DIALOG = "dlg-thanks";
     
     private final static String NETWORK_SETTINGS_FILE = "qosc_network.cfg";
     private final static String OSC_SETTINGS_FILE = "qosc_osc.cfg";
@@ -573,7 +575,7 @@ public class QuickOSCActivity extends FragmentActivity {
 
     private void createDonationDialog() {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        Fragment prev = getSupportFragmentManager().findFragmentByTag("dlg-donate");
+        Fragment prev = getSupportFragmentManager().findFragmentByTag(DONATE_DIALOG);
         if(prev != null) {
             ft.remove(prev);
         }
@@ -587,19 +589,19 @@ public class QuickOSCActivity extends FragmentActivity {
             }
         });
 
-        frgDonationsDialog.show(ft, "dlg-donate");
+        frgDonationsDialog.show(ft, DONATE_DIALOG);
     }
 
     private void showThankYouDialog() {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        Fragment prev = getSupportFragmentManager().findFragmentByTag("dlg-thanks");
+        Fragment prev = getSupportFragmentManager().findFragmentByTag(THANKS_DIALOG);
         if(prev != null) {
             ft.remove(prev);
         }
         ft.addToBackStack(null);
 
         final ThankYouDialogFragment frgThankYouDialog = ThankYouDialogFragment.newInstance();
-        frgThankYouDialog.show(ft, "dlg-thanks");
+        frgThankYouDialog.show(ft, THANKS_DIALOG);
     }
 
     private void showAndrOSCPromo() {
