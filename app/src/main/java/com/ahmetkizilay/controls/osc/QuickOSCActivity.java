@@ -20,6 +20,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
@@ -512,7 +513,15 @@ public class QuickOSCActivity extends Activity {
     private Dialog createAboutDialog() {
     	LayoutInflater inflator = LayoutInflater.from(this);
     	final View aboutView = inflator.inflate(R.layout.dialog_about, null);
-    	
+
+        PackageManager pm = getPackageManager();
+        String versionName = "1.0.0";
+        try {
+            versionName = pm.getPackageInfo(getPackageName(), 0).versionName;
+        } catch (Exception e) {}
+
+        String title = getResources().getString(R.string.app_name) + " - v" + versionName;
+
     	AlertDialog alert = new AlertDialog.Builder(this).create();
     	alert.setView(aboutView);
     	alert.setCancelable(false);
@@ -522,14 +531,14 @@ public class QuickOSCActivity extends Activity {
 				dialog.dismiss();
 			}			
 		});
-    	alert.setButton(Dialog.BUTTON_POSITIVE, "Follow Me", new DialogInterface.OnClickListener() {
+    	alert.setButton(Dialog.BUTTON_POSITIVE, "RATE ME", new DialogInterface.OnClickListener() {
 			
 			public void onClick(DialogInterface dialog, int which) {
-				Intent twitterIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://mobile.twitter.com/ahmetkizilay"));				
-				startActivity(twitterIntent);				
+				Intent rateIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + getPackageName()));
+				startActivity(rateIntent);
 			}
 		});
-    	alert.setTitle("QuickOSC");
+    	alert.setTitle(title);
     	alert.setIcon(R.drawable.qosc);
 		return alert;
     }
@@ -619,7 +628,8 @@ public class QuickOSCActivity extends Activity {
     /**
      * Sends the OSC message passed by the Wrappers. Requires a successful initializeOSC() method
      * to be able to access the host.
-     * @param message
+     * @param address
+     * @param arguments
      */
     
     public void sendOSC(String address, Object[] arguments) {    	

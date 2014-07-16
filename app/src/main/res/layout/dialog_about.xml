@@ -4,18 +4,11 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <!-- <TextView
-        android:id="@+id/textView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="QuickOSC"
-        android:textAppearance="?android:attr/textAppearanceLarge" /> -->
-
     <TextView
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Version 1.4"
+        android:text="Developed by Ahmet Kizilay"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
