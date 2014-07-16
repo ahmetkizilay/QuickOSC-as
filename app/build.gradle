@@ -14,10 +14,9 @@ apply plugin: 'android'
 
 android {
     compileSdkVersion 19
-    buildToolsVersion "19.1.0"
-
+    buildToolsVersion '19.1.0'
     defaultConfig {
-        applicationId "com.ahmetkizilay.controls.osc"
+        applicationId 'com.ahmetkizilay.controls.osc'
         minSdkVersion 10
         targetSdkVersion 19
         versionCode 10
@@ -27,7 +26,6 @@ android {
             targetCompatibility JavaVersion.VERSION_1_5
         }
     }
-
     signingConfigs {
         release {
             storeFile file(keysJSON.keyStorePath)
@@ -44,8 +42,16 @@ android {
             signingConfig signingConfigs.release
         }
     }
+    productFlavors {
+    }
 }
 
 dependencies {
     compile files('libs/javaosc.jar')
+    compile(name: 'donations', ext: 'aar')
+    compile 'com.android.support:support-v4:+'
+}
+
+repositories {
+    flatDir { dirs 'aars' }
 }

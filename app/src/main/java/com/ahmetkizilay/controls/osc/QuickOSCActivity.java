@@ -10,7 +10,8 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
-import com.ahmetkizilay.controls.osc.R;
+import com.ahmetkizilay.modules.donations.PaymentDialogFragment;
+import com.ahmetkizilay.modules.donations.ThankYouDialogFragment;
 import com.illposed.osc.OSCMessage;
 import com.illposed.osc.OSCPortOut;
 
@@ -26,6 +27,10 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -48,7 +53,7 @@ import android.widget.ToggleButton;
  * @author ahmetkizilay
  *
  */
-public class QuickOSCActivity extends Activity {
+public class QuickOSCActivity extends FragmentActivity {
 	private final static int BUTTON_OSC_INTENT_RESULT = 1;
     private final static int TOGGLE_OSC_INTENT_RESULT = 2;
     private final static int SEEKBAR_OSC_INTENT_RESULT = 3;
@@ -367,7 +372,16 @@ public class QuickOSCActivity extends Activity {
     @Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {		
 		super.onActivityResult(requestCode, resultCode, data);
-		
+
+        if(requestCode == PaymentDialogFragment.PAYMENT_RESULT_CODE) {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            Fragment fragment = fragmentManager.findFragmentByTag("dlg-donate");
+            if (fragment != null)
+            {
+                fragment.onActivityResult(requestCode, resultCode, data);
+            }
+        }
+
 		if(resultCode == Activity.RESULT_OK) {
 			switch(requestCode) {
 			case BUTTON_OSC_INTENT_RESULT:
@@ -379,7 +393,7 @@ public class QuickOSCActivity extends Activity {
 			case SEEKBAR_OSC_INTENT_RESULT:
 				handleSeekBarOSCSettingResult(data);
 				break;
-			}
+            }
 		}
 	}
         
@@ -524,11 +538,12 @@ public class QuickOSCActivity extends Activity {
 
     	AlertDialog alert = new AlertDialog.Builder(this).create();
     	alert.setView(aboutView);
-    	alert.setCancelable(false);
-    	alert.setButton(Dialog.BUTTON_NEUTRAL, "Close", new DialogInterface.OnClickListener() {
+    	alert.setCancelable(true);
+    	alert.setButton(Dialog.BUTTON_NEUTRAL, "DONATE", new DialogInterface.OnClickListener() {
 			
 			public void onClick(DialogInterface dialog, int which) {
 				dialog.dismiss();
+                createDonationDialog();
 			}			
 		});
     	alert.setButton(Dialog.BUTTON_POSITIVE, "RATE ME", new DialogInterface.OnClickListener() {
@@ -542,7 +557,38 @@ public class QuickOSCActivity extends Activity {
     	alert.setIcon(R.drawable.qosc);
 		return alert;
     }
-    
+
+    private void createDonationDialog() {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        Fragment prev = getSupportFragmentManager().findFragmentByTag("dlg-donate");
+        if(prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+
+        final PaymentDialogFragment frgDonationsDialog = PaymentDialogFragment.getInstance(R.array.product_ids);
+        frgDonationsDialog.setPaymentCompletedListener(new PaymentDialogFragment.PaymentCompletedListener() {
+            public void onPaymentCompleted() {
+               frgDonationsDialog.dismiss();
+               showThankYouDialog();
+            }
+        });
+
+        frgDonationsDialog.show(ft, "dlg-donate");
+    }
+
+    private void showThankYouDialog() {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        Fragment prev = getSupportFragmentManager().findFragmentByTag("dlg-thanks");
+        if(prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+
+        final ThankYouDialogFragment frgThankYouDialog = ThankYouDialogFragment.newInstance();
+        frgThankYouDialog.show(ft, "dlg-thanks");
+    }
+
     /**
      * creates Network Settings Dialog. Gets the layout tamplate from the xml file.
      * Stores ipAddress and port values.
