@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingTop="12dp"
+    android:paddingLeft="8dp" android:paddingRight="8dp">
+
+    <TextView
+        android:id="@+id/tw_promoText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="If you work with OSC, please check out my other app AndrOSC"
+        android:paddingBottom="48dp"
+        android:textSize="20dp"/>
+
+    <CheckBox
+        android:id="@+id/cbNeverShow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Never show this message again"
+        android:textSize="16dp"/>
+</LinearLayout>

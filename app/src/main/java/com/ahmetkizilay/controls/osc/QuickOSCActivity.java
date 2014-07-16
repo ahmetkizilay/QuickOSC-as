@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
+import com.ahmetkizilay.controls.osc.fragments.PromoDialogFragment;
 import com.ahmetkizilay.modules.donations.PaymentDialogFragment;
 import com.ahmetkizilay.modules.donations.ThankYouDialogFragment;
 import com.illposed.osc.OSCMessage;
@@ -21,6 +22,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -61,9 +63,13 @@ public class QuickOSCActivity extends FragmentActivity {
     private final static int ABOUT_DIALOG = 1;
     private final static int NETWORK_DIALOG = 2;
     private final static int WIFI_ALERT_DIALOG = 3;
+
+    private final static String PROMO_DIALOG = "dlg-promo";
     
     private final static String NETWORK_SETTINGS_FILE = "qosc_network.cfg";
     private final static String OSC_SETTINGS_FILE = "qosc_osc.cfg";
+    private final static String PREF_FILE = "qosc_pref";
+    private final static String PROMO_SHOWN = "promo_shown";
             
     private List<ButtonOSCWrapper> buttonOSCWrapperList = new ArrayList<ButtonOSCWrapper>();
     private List<ToggleOSCWrapper> toggleOSCWrapperList = new ArrayList<ToggleOSCWrapper>();
@@ -279,9 +285,16 @@ public class QuickOSCActivity extends FragmentActivity {
         		safeFloatParse(oscSettingsHashtable.get("seekBar4-minval"), 0),
         		safeFloatParse(oscSettingsHashtable.get("seekBar4-maxval"), 100),
         		seekBar4, this));
-        
-        checkWifiState();
 
+
+        SharedPreferences settings = getSharedPreferences(PREF_FILE, 0);
+        boolean dialogShown = settings.getBoolean(PROMO_SHOWN, false);
+
+        boolean wifiOn = checkWifiState();
+
+        if(wifiOn && !dialogShown) {
+            showAndrOSCPromo();
+        }
     }
     
     
@@ -589,6 +602,50 @@ public class QuickOSCActivity extends FragmentActivity {
         frgThankYouDialog.show(ft, "dlg-thanks");
     }
 
+    private void showAndrOSCPromo() {
+        final String andrOSCPackage = "com.ahmetkizilay.controls.androsc";
+        String buttonLabel = "GO TO APP";
+        String message = "If you are interested in OSC, please check out my other app AndrOSC";
+        String title = "New App - AndrOSC";
+        int iconId = R.drawable.qosc;
+
+        // TODO check if app is installed first
+
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        Fragment prev = getSupportFragmentManager().findFragmentByTag(PROMO_DIALOG);
+        if(prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+
+        final PromoDialogFragment frg = PromoDialogFragment.newInstance(iconId, title, message, buttonLabel);
+        frg.setDialogClosedListener(new PromoDialogFragment.DialogClosedListener() {
+            public void onDialogClosed(boolean neverOpen) {
+                if(neverOpen) {
+                    SharedPreferences.Editor editor = getSharedPreferences(PREF_FILE, 0).edit();
+                    editor.putBoolean(PROMO_SHOWN, true);
+                    editor.commit();
+                }
+            }
+            public void onPromoRequested() {
+                frg.dismiss();
+
+                SharedPreferences.Editor editor = getSharedPreferences(PREF_FILE, 0).edit();
+                editor.putBoolean(PROMO_SHOWN, true);
+                editor.commit();
+
+                try {
+                    Intent viewIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + andrOSCPackage));
+                    startActivity(viewIntent);
+                }
+                catch(Exception exp) {
+
+                }
+            }
+        });
+        frg.show(ft, PROMO_DIALOG);
+    }
+
     /**
      * creates Network Settings Dialog. Gets the layout tamplate from the xml file.
      * Stores ipAddress and port values.
@@ -828,10 +885,13 @@ public class QuickOSCActivity extends FragmentActivity {
     	super.onBackPressed();
     }
     
-    private void checkWifiState() {
+    private boolean checkWifiState() {
     	WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
     	if(!wifiManager.isWifiEnabled()) {
     		showDialog(WIFI_ALERT_DIALOG);
+            return false;
     	}
+
+        return true;
     }
 }
