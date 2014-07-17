@@ -33,6 +33,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -604,6 +605,11 @@ public class QuickOSCActivity extends FragmentActivity {
         frgThankYouDialog.show(ft, THANKS_DIALOG);
     }
 
+    /***
+     * this method is called is PROMO_SHOWN flag is still false in shared preferences.
+     * the promo dialog is shown if AndrOSC activity is not present
+     * and the flag is set to if the user clicks to view promo or checks the never show check box
+     */
     private void showAndrOSCPromo() {
         final String andrOSCPackage = "com.ahmetkizilay.controls.androsc";
         String buttonLabel = "GO TO APP";
@@ -611,7 +617,14 @@ public class QuickOSCActivity extends FragmentActivity {
         String title = "New App - AndrOSC";
         int iconId = R.drawable.qosc;
 
-        // TODO check if app is installed first
+        // checking if AndrOSC is already installed
+        PackageManager pm = getPackageManager();
+        try {
+            pm.getPackageInfo(andrOSCPackage, PackageManager.GET_ACTIVITIES);
+            saveSharedPreference(PROMO_SHOWN, true);
+            return;
+        }
+        catch(PackageManager.NameNotFoundException nnfe) {}
 
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         Fragment prev = getSupportFragmentManager().findFragmentByTag(PROMO_DIALOG);
@@ -624,28 +637,35 @@ public class QuickOSCActivity extends FragmentActivity {
         frg.setDialogClosedListener(new PromoDialogFragment.DialogClosedListener() {
             public void onDialogClosed(boolean neverOpen) {
                 if(neverOpen) {
-                    SharedPreferences.Editor editor = getSharedPreferences(PREF_FILE, 0).edit();
-                    editor.putBoolean(PROMO_SHOWN, true);
-                    editor.commit();
+                    saveSharedPreference(PROMO_SHOWN, true);
                 }
             }
             public void onPromoRequested() {
                 frg.dismiss();
 
-                SharedPreferences.Editor editor = getSharedPreferences(PREF_FILE, 0).edit();
-                editor.putBoolean(PROMO_SHOWN, true);
-                editor.commit();
+                saveSharedPreference(PROMO_SHOWN, true);
 
                 try {
                     Intent viewIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + andrOSCPackage));
                     startActivity(viewIntent);
                 }
                 catch(Exception exp) {
-
+                    Toast.makeText(QuickOSCActivity.this, "Cannot Open Android Market", Toast.LENGTH_SHORT).show();
                 }
             }
         });
         frg.show(ft, PROMO_DIALOG);
+    }
+
+    /***
+     * Saves a boolean value in shared preferences.
+     * @param tag string to hold the reference to the preference
+     * @param value value to be saved
+     */
+    private void saveSharedPreference(String tag, boolean value) {
+        SharedPreferences.Editor editor = getSharedPreferences(PREF_FILE, 0).edit();
+        editor.putBoolean(tag, value);
+        editor.commit();
     }
 
     /**
