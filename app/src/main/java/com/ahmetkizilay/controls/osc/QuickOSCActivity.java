@@ -10,7 +10,10 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
+import com.ahmetkizilay.controls.osc.fragments.AboutMeDialogFragment;
+import com.ahmetkizilay.controls.osc.fragments.NetworkDialogFragment;
 import com.ahmetkizilay.controls.osc.fragments.PromoDialogFragment;
+import com.ahmetkizilay.controls.osc.fragments.WifiSettingsDialogFragment;
 import com.ahmetkizilay.modules.donations.PaymentDialogFragment;
 import com.ahmetkizilay.modules.donations.ThankYouDialogFragment;
 import com.illposed.osc.OSCMessage;
@@ -33,14 +36,10 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -60,15 +59,14 @@ public class QuickOSCActivity extends FragmentActivity {
 	private final static int BUTTON_OSC_INTENT_RESULT = 1;
     private final static int TOGGLE_OSC_INTENT_RESULT = 2;
     private final static int SEEKBAR_OSC_INTENT_RESULT = 3;
-    
-    private final static int ABOUT_DIALOG = 1;
-    private final static int NETWORK_DIALOG = 2;
-    private final static int WIFI_ALERT_DIALOG = 3;
 
     private final static String PROMO_DIALOG = "dlg-promo";
     private final static String DONATE_DIALOG = "dlg-donate";
     private final static String THANKS_DIALOG = "dlg-thanks";
-    
+    private final static String NETWORK_DIALOG = "dlg-network";
+    private final static String ABOUT_DIALOG = "dlg-about";
+    private final static String WIFI_ALERT_DIALOG = "dlg-wifi";
+
     private final static String NETWORK_SETTINGS_FILE = "qosc_network.cfg";
     private final static String OSC_SETTINGS_FILE = "qosc_osc.cfg";
     private final static String PREF_FILE = "qosc_pref";
@@ -487,91 +485,85 @@ public class QuickOSCActivity extends FragmentActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
     	switch (item.getItemId()) {
 		case R.id.about_page:
-			showDialog(ABOUT_DIALOG);
+			createAboutDialog();
 			return true;
 		case R.id.edit_menu:
 			toggleEditMode();
 			return true;
 		case R.id.network_menu:
-			showDialog(NETWORK_DIALOG);
+            createNetworkDialog();
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
     }
-    
-    @Override
-    protected Dialog onCreateDialog(int id) {
-    	switch(id) {
-    	case ABOUT_DIALOG:
-    		return createAboutDialog();
-    	case NETWORK_DIALOG:
-    		return createNetworkDialog();
-    	case WIFI_ALERT_DIALOG:
-    		return createWifiAlertDialog();
-    	default:
-    		return null;
-    	}
-    }
-    
-    private Dialog createWifiAlertDialog() {
-    	AlertDialog alert = new AlertDialog.Builder(this).create();
-    	alert.setTitle("Wifi Not Detected");
-    	alert.setCancelable(false);
-    	alert.setMessage("Enable Wifi For OSC");
-    	alert.setButton(Dialog.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
-    		public void onClick(DialogInterface dialog, int which) {
-    			dialog.dismiss();
-    			removeDialog(WIFI_ALERT_DIALOG);
-    		}
-    	});
-    	alert.setButton(Dialog.BUTTON_POSITIVE, "Wifi Settings", new DialogInterface.OnClickListener() {
-    		public void onClick(DialogInterface dialog, int which) {
-    			dialog.dismiss();
-    			removeDialog(WIFI_ALERT_DIALOG);
-    			Intent wifiIntent = new Intent(android.provider.Settings.ACTION_WIFI_SETTINGS);
-				startActivity(wifiIntent);
-    		}
-    	});
-    	return alert;
-    }
-    
+
     /**
-     * Creates a simple about dialog for self promotion.
-     * @return
+     * Creates WifiAlert Fragment. Called from checkWifiState method
+     * on callback, ACTION_WIFI_SETTINGS intent is called to change wifi settings.
      */
-    private Dialog createAboutDialog() {
-    	LayoutInflater inflator = LayoutInflater.from(this);
-    	final View aboutView = inflator.inflate(R.layout.dialog_about, null);
+    private void createWifiAlertDialog() {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        Fragment prev = getSupportFragmentManager().findFragmentByTag(WIFI_ALERT_DIALOG);
+        if(prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
 
-        PackageManager pm = getPackageManager();
-        String versionName = "1.0.0";
-        try {
-            versionName = pm.getPackageInfo(getPackageName(), 0).versionName;
-        } catch (Exception e) {}
+        final WifiSettingsDialogFragment frg = WifiSettingsDialogFragment.newInstance();
+        frg.setWifiSettingsDialogListener(new WifiSettingsDialogFragment.WifiSettingsDialogListener() {
 
-        String title = getResources().getString(R.string.app_name) + " - v" + versionName;
+            public void onWifiSettingsRequested() {
+                frg.dismiss();
+                try {
+                    Intent wifiIntent = new Intent(android.provider.Settings.ACTION_WIFI_SETTINGS);
+                    startActivity(wifiIntent);
+                }
+                catch(Exception exp) {
+                    Toast.makeText(QuickOSCActivity.this, "Cannot Open Wifi Settings", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
 
-    	AlertDialog alert = new AlertDialog.Builder(this).create();
-    	alert.setView(aboutView);
-    	alert.setCancelable(true);
-    	alert.setButton(Dialog.BUTTON_NEUTRAL, "DONATE", new DialogInterface.OnClickListener() {
-			
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.dismiss();
+        frg.show(ft, WIFI_ALERT_DIALOG);
+    }
+    
+     /**
+     * Creates About Me Fragment. Called from onOptionsItemSelected method
+     * on callback, either donate dialog is shown or redirected to rate activity.
+     * and reconnects to the network
+     */
+    private void createAboutDialog() {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        Fragment prev = getSupportFragmentManager().findFragmentByTag(ABOUT_DIALOG);
+        if(prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+
+        final AboutMeDialogFragment frg = AboutMeDialogFragment.newInstance();
+        frg.setAboutMeDialogListener(new AboutMeDialogFragment.AboutMeDialogListener() {
+
+
+            public void onRateMeSelected() {
+                frg.dismiss();
+
+                try {
+                    Intent rateIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + getPackageName()));
+                    startActivity(rateIntent);
+                }
+                catch(Exception exp) {
+                    Toast.makeText(QuickOSCActivity.this, "Cannot Open Android Market", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            public void onDonateSelected() {
+                frg.dismiss();
                 createDonationDialog();
-			}			
-		});
-    	alert.setButton(Dialog.BUTTON_POSITIVE, "RATE ME", new DialogInterface.OnClickListener() {
-			
-			public void onClick(DialogInterface dialog, int which) {
-				Intent rateIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + getPackageName()));
-				startActivity(rateIntent);
-			}
-		});
-    	alert.setTitle(title);
-    	alert.setIcon(R.drawable.qosc);
-		return alert;
+            }
+        });
+
+        frg.show(ft, ABOUT_DIALOG);
     }
 
     private void createDonationDialog() {
@@ -669,35 +661,29 @@ public class QuickOSCActivity extends FragmentActivity {
     }
 
     /**
-     * creates Network Settings Dialog. Gets the layout tamplate from the xml file.
-     * Stores ipAddress and port values.
-     * @return
+     * Creates Network Settings Fragment. Called from onOptionsItemSelected method
+     * onSettingsSaved callback from the fragment stores ipAddress and port values
+     * and reconnects to the network
      */
-    private Dialog createNetworkDialog() {
-    	LayoutInflater inflator = LayoutInflater.from(this);
-    	final View networkView = inflator.inflate(R.layout.dialog_network_settings, null);
-    	EditText etNetworkIP = (EditText) networkView.findViewById(R.id.etNetworkIP);
-    	etNetworkIP.setText(ipAddress);
-    	
-    	EditText etNetworkPort = (EditText) networkView.findViewById(R.id.etNetworkPort);
-    	etNetworkPort.setText(Integer.toString(port));
-    	
-    	final AlertDialog alert = new AlertDialog.Builder(this).create();
-    	alert.setView(networkView);
-    	alert.setTitle("Network Settings");
-    	alert.setButton(Dialog.BUTTON_POSITIVE, "Save", new DialogInterface.OnClickListener() {			
-			public void onClick(DialogInterface dialog, int which) {
-				EditText etNetworkIP = (EditText) alert.findViewById(R.id.etNetworkIP);
-				ipAddress = etNetworkIP.getText().toString();
-				
-				EditText etNetworkPort = (EditText) alert.findViewById(R.id.etNetworkPort);
-				port = Integer.parseInt(etNetworkPort.getText().toString());
-				
-				saveNetworkSettinsIntoFile();
-				initializeOSC();
-			}
-		});
-    	return alert;
+    private void createNetworkDialog() {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        Fragment prev = getSupportFragmentManager().findFragmentByTag(NETWORK_DIALOG);
+        if(prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+
+        final NetworkDialogFragment frg = NetworkDialogFragment.newInstance(ipAddress, port);
+        frg.setNetworkDialogListener(new NetworkDialogFragment.NetworkDialogListener() {
+            public void onSettingsSaved(String ipAddress, int port) {
+                QuickOSCActivity.this.ipAddress = ipAddress;
+                QuickOSCActivity.this.port = port;
+
+                saveNetworkSettinsIntoFile();
+                initializeOSC();
+            }
+        });
+        frg.show(ft, NETWORK_DIALOG);
     }
     
     /**
@@ -910,7 +896,7 @@ public class QuickOSCActivity extends FragmentActivity {
     private boolean checkWifiState() {
     	WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
     	if(!wifiManager.isWifiEnabled()) {
-    		showDialog(WIFI_ALERT_DIALOG);
+    		createWifiAlertDialog();
             return false;
     	}
 
