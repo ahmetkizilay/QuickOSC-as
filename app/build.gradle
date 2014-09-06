@@ -49,7 +49,7 @@ android {
 dependencies {
     compile files('libs/javaosc.jar')
     compile(name: 'donations', ext: 'aar')
-    compile 'com.android.support:support-v4:+'
+    compile 'com.android.support:support-v4:19.0.1'
 }
 
 repositories {
