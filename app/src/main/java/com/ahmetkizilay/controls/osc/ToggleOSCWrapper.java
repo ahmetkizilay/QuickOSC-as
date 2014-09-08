@@ -25,59 +25,30 @@ public class ToggleOSCWrapper implements OnCheckedChangeListener{
 	private String messageToggleOffAddr;
 	private List<Object> messageToggleOffArgs;
 	private String messageToggleOffRaw;
-	private String name;
+	private String onLabel;
+    private String offLabel;
 
-   private ToggleButton toggle;
+    private ToggleButton toggle;
 	private int index;
-	
-	/**
-	 * Default constructor publicly available for other classes.
-	 * @param name Only used to set the default OSC message.
-	 * @param button
-	 * @param parentActivity
-	 * @return
-	 */
-	public static ToggleOSCWrapper createInstance(int index, String name, ToggleButton button, QuickOSCActivity parentActivity) {
-		return new ToggleOSCWrapper(index, name, button, parentActivity);
+
+	public static ToggleOSCWrapper createInstance(int index, String onLabel, String offLabel, String msgToggleOn, String msgToggleOff, ToggleButton button, QuickOSCActivity parentActivity) {
+		return new ToggleOSCWrapper(index, onLabel, offLabel, msgToggleOn, msgToggleOff, button, parentActivity);
 	}
-	
-	public static ToggleOSCWrapper createInstance(int index, String name, String msgToggleOn, String msgToggleOff, ToggleButton button, QuickOSCActivity parentActivity) {
-		return new ToggleOSCWrapper(index, name, msgToggleOn, msgToggleOff, button, parentActivity);
-	}
-	
-	private ToggleOSCWrapper(int index, String name, ToggleButton button, QuickOSCActivity parentActivity) {
+
+	private ToggleOSCWrapper(int index, String onLabel, String offLabel, String msgToggleOn, String msgToggleOff, ToggleButton button, QuickOSCActivity parentActivity) {
 		this.index = index;
 		this.parentActivity = parentActivity;
-		this.name = name;
-		
-		this.messageToggleOnAddr = "/" + name + "/1";
-		this.messageToggleOnArgs = null;
-		this.messageToggleOnRaw = this.messageToggleOnAddr;
-		
-		this.messageToggleOffAddr = "/" + name + "/0";
-		this.messageToggleOffArgs = null;
-		this.messageToggleOffRaw = this.messageToggleOffAddr;
-		
-		this.toggle = button;
-		this.toggle.setOnCheckedChangeListener(this);
-        this.toggle.setText(name);
-        this.toggle.setTextOn(name);
-        this.toggle.setTextOff(name);
-	}
-	
-	private ToggleOSCWrapper(int index, String name, String msgToggleOn, String msgToggleOff, ToggleButton button, QuickOSCActivity parentActivity) {
-		this.index = index;
-		this.parentActivity = parentActivity;
-		this.name = name;
+		this.onLabel = onLabel;
+        this.offLabel = offLabel;
 
 		this.setMessageToggleOn(msgToggleOn);
 		this.setMessageToggleOff(msgToggleOff);
 
         this.toggle = button;
         this.toggle.setOnCheckedChangeListener(this);
-        this.toggle.setText(name);
-        this.toggle.setTextOn(name);
-        this.toggle.setTextOff(name);
+        this.toggle.setText(offLabel);
+        this.toggle.setTextOn(onLabel);
+        this.toggle.setTextOff(offLabel);
 	}
 
 	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -103,7 +74,7 @@ public class ToggleOSCWrapper implements OnCheckedChangeListener{
 
 	public void setMessageToggleOn(String messageToggleOn) {
 		if(messageToggleOn == null || messageToggleOn.equals("")) {
-			this.messageToggleOnAddr = "/" + name + "/1";
+			this.messageToggleOnAddr = "/tog" + (index+1) + "/1";
 			this.messageToggleOnArgs = null;
 			this.messageToggleOnRaw = this.messageToggleOnAddr;
 		}
@@ -127,7 +98,7 @@ public class ToggleOSCWrapper implements OnCheckedChangeListener{
 
 	public void setMessageToggleOff(String messageToggleOff) {
 		if(messageToggleOff == null || messageToggleOff.equals("")) {
-			this.messageToggleOffAddr = "/" + name + "/0";
+			this.messageToggleOffAddr = "/tog" + (index+1) + "/0";
 			this.messageToggleOffArgs = null;
 			this.messageToggleOffRaw = this.messageToggleOffAddr;
 		}
@@ -152,14 +123,38 @@ public class ToggleOSCWrapper implements OnCheckedChangeListener{
             }
         });
     }
-	
-	public String getName() {
-		return this.name;
-	}
-	
-	public void setName(String name) {
-		this.name = name;
-	}
+
+    public String getOnLabel() {
+        return this.onLabel;
+    }
+
+    public String getOffLabel() {
+        return this.offLabel;
+    }
+
+    public void setOnLabel(String onLabel) {
+        this.onLabel = onLabel;
+        this.parentActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                if(ToggleOSCWrapper.this.toggle.isChecked()) {
+                    ToggleOSCWrapper.this.toggle.setText(ToggleOSCWrapper.this.onLabel);
+                }
+                ToggleOSCWrapper.this.toggle.setTextOn(ToggleOSCWrapper.this.onLabel);
+            }
+        });
+    }
+
+    public void setOffLabel(String offLabel) {
+        this.offLabel = offLabel;
+        this.parentActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                if(!ToggleOSCWrapper.this.toggle.isChecked()) {
+                    ToggleOSCWrapper.this.toggle.setText(ToggleOSCWrapper.this.offLabel);
+                }
+                ToggleOSCWrapper.this.toggle.setTextOff(ToggleOSCWrapper.this.offLabel);
+            }
+        });
+    }
 	
 	public int getIndex() {
 		return this.index;

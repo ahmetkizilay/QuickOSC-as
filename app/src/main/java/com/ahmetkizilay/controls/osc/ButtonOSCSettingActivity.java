@@ -24,6 +24,7 @@ import android.widget.EditText;
  */
 public class ButtonOSCSettingActivity extends Activity implements OnClickListener{
 
+    private EditText editTextLabel;
 	private EditText editTextButtonPressed;
 	private EditText editTextButtonReleased;
 	private CheckBox checkBoxTrigButtonReleased;
@@ -38,14 +39,19 @@ public class ButtonOSCSettingActivity extends Activity implements OnClickListene
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.button_osc_layout);
 		
-		Intent originalIntent = getIntent(); 
+		Intent originalIntent = getIntent();
+        String label = originalIntent.getStringExtra("label");
 		String msgButtonPressed = originalIntent.getStringExtra("msgButtonPressed");
 		String msgButtonReleased = originalIntent.getStringExtra("msgButtonReleased");
 		boolean trigButtonReleased = originalIntent.getBooleanExtra("trigButtonReleased", false);
 		this.selectedIndex = originalIntent.getIntExtra("index", 0);
-		
+
+        editTextLabel = (EditText) findViewById(R.id.etLabel);
+        if(label != null && !label.equalsIgnoreCase("")) {
+            editTextLabel.setText(label);
+        }
+
 		editTextButtonPressed = (EditText) findViewById(R.id.etButtonPressed);
-		
 		if(msgButtonPressed != null && !msgButtonPressed.equalsIgnoreCase("")) {	
 			editTextButtonPressed.setText(msgButtonPressed);
 		}
@@ -79,6 +85,7 @@ public class ButtonOSCSettingActivity extends Activity implements OnClickListene
 		Intent data = new Intent();
 		
 		if(view.equals(btnButtonSave)) {
+            data.putExtra("label", editTextLabel.getText());
 			data.putExtra("msgButtonPressed", editTextButtonPressed.getText());
 			data.putExtra("msgButtonReleased", editTextButtonReleased.getText());
 			data.putExtra("trigButtonReleased", checkBoxTrigButtonReleased.isChecked());

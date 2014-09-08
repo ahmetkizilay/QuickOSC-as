@@ -2,21 +2,51 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    android:paddingTop="12dp"
+    android:paddingRight="8dp"
+    android:paddingLeft="8dp">
 
     <TextView
-        android:id="@+id/textView0"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text=""
+        android:text="Label Toggled On"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
+    <EditText
+        android:id="@+id/etOnLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="Label when toggledOn" >
+
+        <requestFocus />
+    </EditText>
+
     <TextView
-        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Label Toggled Off"
+        android:layout_marginTop="12dp"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <EditText
+        android:id="@+id/etOffLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="Label when toggledOn" >
+
+        <requestFocus />
+    </EditText>
+
+    <TextView
+        android:id="@+id/tvToggledOnTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Toggle On"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:layout_marginTop="12dp"/>
 
     <EditText
         android:id="@+id/etToggleOn"
@@ -25,22 +55,14 @@
         android:ems="10"
         android:hint="Message Sent When Toggled On" >
 
-        <requestFocus />
     </EditText>
 
     <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-    <TextView
-        android:id="@+id/textView3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Toggle Off"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:layout_marginTop="12dp"/>
 
     <EditText
         android:id="@+id/etToggleOff"
@@ -49,17 +71,11 @@
         android:ems="10"
         android:hint="Message Sent When Toggled Off" />
 
-    <TextView
-        android:id="@+id/textView4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center" >
+        android:gravity="center"
+        android:layout_marginTop="12dp">
 
         <Button
             android:id="@+id/btnToggleSave"

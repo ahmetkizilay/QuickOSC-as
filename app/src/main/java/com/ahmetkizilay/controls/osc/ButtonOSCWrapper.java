@@ -65,6 +65,7 @@ public class ButtonOSCWrapper implements OnTouchListener{
 		this.messageButtonReleasedRaw = this.messageButtonReleasedAddr;
 		
 		this.button.setOnTouchListener(this);
+        this.button.setText(this.name);
 	}
 	
 	private ButtonOSCWrapper(int index, String name, String msgButtonPressed, boolean trigWhenButtonReleased, String msgButtonReleased, Button button, QuickOSCActivity parentActivity) {
@@ -78,6 +79,7 @@ public class ButtonOSCWrapper implements OnTouchListener{
 		
 		this.triggerWhenButtonReleased = trigWhenButtonReleased;
 		this.button.setOnTouchListener(this);
+        this.button.setText(this.name);
 	}
 
 	public boolean onTouch(View v, MotionEvent event) {
@@ -166,6 +168,12 @@ public class ButtonOSCWrapper implements OnTouchListener{
 	
 	public void setName(String name) {
 		this.name = name;
+        this.parentActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                ButtonOSCWrapper.this.button.setText(ButtonOSCWrapper.this.name);
+            }
+        });
+
 	}
 	
 	public int getIndex() {

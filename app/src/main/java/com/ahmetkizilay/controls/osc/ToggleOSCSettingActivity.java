@@ -20,6 +20,8 @@ import android.widget.EditText;
  */
 public class ToggleOSCSettingActivity extends Activity implements OnClickListener{
 
+    private EditText editTextOnLabel;
+    private EditText editTextOffLabel;
 	private EditText editTextToggleOn;
 	private EditText editTextToggleOff;
 	
@@ -33,10 +35,22 @@ public class ToggleOSCSettingActivity extends Activity implements OnClickListene
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.toggle_osc_layout);
 		
-		Intent originalIntent = getIntent(); 
+		Intent originalIntent = getIntent();
+        String onLabel = originalIntent.getStringExtra("onLabel");
+        String offLabel = originalIntent.getStringExtra("offLabel");
 		String msgToggleOn = originalIntent.getStringExtra("msgToggleOn");
 		String msgToggleOff = originalIntent.getStringExtra("msgToggleOff");
 		this.selectedIndex = originalIntent.getIntExtra("index", 0);
+
+        editTextOnLabel = (EditText) findViewById(R.id.etOnLabel);
+        if(onLabel != null && !onLabel.equalsIgnoreCase("")) {
+            editTextOnLabel.setText(onLabel);
+        }
+
+        editTextOffLabel = (EditText) findViewById(R.id.etOffLabel);
+        if(offLabel != null && !offLabel.equalsIgnoreCase("")) {
+            editTextOffLabel.setText(offLabel);
+        }
 		
 		editTextToggleOn = (EditText) findViewById(R.id.etToggleOn);		
 		if(msgToggleOn != null && !msgToggleOn.equalsIgnoreCase("")) {	
@@ -59,6 +73,8 @@ public class ToggleOSCSettingActivity extends Activity implements OnClickListene
 		Intent data = new Intent();
 		
 		if(view.equals(btnToggleSave)) {
+            data.putExtra("onLabel", editTextOnLabel.getText());
+            data.putExtra("offLabel", editTextOffLabel.getText());
 			data.putExtra("msgToggleOn", editTextToggleOn.getText());
 			data.putExtra("msgToggleOff", editTextToggleOff.getText());	
 			data.putExtra("index", this.selectedIndex);

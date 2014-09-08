@@ -86,7 +86,7 @@ public class QuickOSCActivity extends FragmentActivity {
     private OSCPortOut oscPortOut = null;
 
     private boolean mListenIncoming = true;
-    private int inPort = 3234;
+    private int inPort = 8090;
     private OSCPortIn oscPortIn;
 
     private OSCListener btnListener;
@@ -106,112 +106,128 @@ public class QuickOSCActivity extends FragmentActivity {
         debugTextView = (TextView) findViewById(R.id.textView1);
         
         Button button1 = (Button) findViewById(R.id.button1);
-        buttonOSCWrapperList.add(ButtonOSCWrapper.createInstance(0, "btn1", 
-						        		oscSettingsHashtable.get("btn1-butpres"), 
-						        		Boolean.parseBoolean(oscSettingsHashtable.get("btn1-trgbutrel")),
-						        		oscSettingsHashtable.get("btn1-butrel"),
-						        		button1, this));
+        buttonOSCWrapperList.add(ButtonOSCWrapper.createInstance(0,
+                oscSettingsHashtable.containsKey("btn1-lbl") ? oscSettingsHashtable.get("btn1-lbl") : "btn1",
+                oscSettingsHashtable.get("btn1-butpres"),
+                Boolean.parseBoolean(oscSettingsHashtable.get("btn1-trgbutrel")),
+                oscSettingsHashtable.get("btn1-butrel"),
+                button1, this));
                 
         Button button2 = (Button) findViewById(R.id.button2);
-        buttonOSCWrapperList.add(ButtonOSCWrapper.createInstance(1, "btn2", 
+        buttonOSCWrapperList.add(ButtonOSCWrapper.createInstance(1,
+                oscSettingsHashtable.containsKey("btn2-lbl") ? oscSettingsHashtable.get("btn2-lbl") : "btn2",
         		oscSettingsHashtable.get("btn2-butpres"), 
         		Boolean.parseBoolean(oscSettingsHashtable.get("btn2-trgbutrel")),
         		oscSettingsHashtable.get("btn2-butrel"),
         		button2, this));
         
         Button button3 = (Button) findViewById(R.id.button3);
-        buttonOSCWrapperList.add(ButtonOSCWrapper.createInstance(2, "btn3", 
+        buttonOSCWrapperList.add(ButtonOSCWrapper.createInstance(2,
+                oscSettingsHashtable.containsKey("btn3-lbl") ? oscSettingsHashtable.get("btn3-lbl") : "btn3",
         		oscSettingsHashtable.get("btn3-butpres"), 
         		Boolean.parseBoolean(oscSettingsHashtable.get("btn3-trgbutrel")),
         		oscSettingsHashtable.get("btn3-butrel"),
         		button3, this));
         
         Button button4 = (Button) findViewById(R.id.button4);
-        buttonOSCWrapperList.add(ButtonOSCWrapper.createInstance(3, "btn4", 
+        buttonOSCWrapperList.add(ButtonOSCWrapper.createInstance(3,
+                oscSettingsHashtable.containsKey("btn4-lbl") ? oscSettingsHashtable.get("btn4-lbl") : "btn4",
         		oscSettingsHashtable.get("btn4-butpres"), 
         		Boolean.parseBoolean(oscSettingsHashtable.get("btn4-trgbutrel")),
         		oscSettingsHashtable.get("btn4-butrel"),
         		button4, this));
         
         Button button5 = (Button) findViewById(R.id.button5);
-        buttonOSCWrapperList.add(ButtonOSCWrapper.createInstance(4, "btn5", 
+        buttonOSCWrapperList.add(ButtonOSCWrapper.createInstance(4,
+                oscSettingsHashtable.containsKey("btn5-lbl") ? oscSettingsHashtable.get("btn5-lbl") : "btn5",
         		oscSettingsHashtable.get("btn5-butpres"), 
         		Boolean.parseBoolean(oscSettingsHashtable.get("btn5-trgbutrel")),
         		oscSettingsHashtable.get("btn5-butrel"),
         		button5, this));
         
         Button button6 = (Button) findViewById(R.id.button6);
-        buttonOSCWrapperList.add(ButtonOSCWrapper.createInstance(5, "btn6", 
+        buttonOSCWrapperList.add(ButtonOSCWrapper.createInstance(5,
+                oscSettingsHashtable.containsKey("btn6-lbl") ? oscSettingsHashtable.get("btn6-lbl") : "btn6",
         		oscSettingsHashtable.get("btn6-butpres"), 
         		Boolean.parseBoolean(oscSettingsHashtable.get("btn6-trgbutrel")),
         		oscSettingsHashtable.get("btn6-butrel"),
         		button6, this));
         
         Button button7 = (Button) findViewById(R.id.button7);
-        buttonOSCWrapperList.add(ButtonOSCWrapper.createInstance(6, "btn7", 
+        buttonOSCWrapperList.add(ButtonOSCWrapper.createInstance(6,
+                oscSettingsHashtable.containsKey("btn7-lbl") ? oscSettingsHashtable.get("btn7-lbl") : "btn7",
         		oscSettingsHashtable.get("btn7-butpres"), 
         		Boolean.parseBoolean(oscSettingsHashtable.get("btn7-trgbutrel")),
         		oscSettingsHashtable.get("btn7-butrel"),
         		button7, this));
         
         Button button8 = (Button) findViewById(R.id.button8);
-        buttonOSCWrapperList.add(ButtonOSCWrapper.createInstance(7, "btn8", 
+        buttonOSCWrapperList.add(ButtonOSCWrapper.createInstance(7,
+                oscSettingsHashtable.containsKey("btn8-lbl") ? oscSettingsHashtable.get("btn8-lbl") : "btn8",
         		oscSettingsHashtable.get("btn8-butpres"), 
         		Boolean.parseBoolean(oscSettingsHashtable.get("btn8-trgbutrel")),
         		oscSettingsHashtable.get("btn8-butrel"),
         		button8, this));
         
         Button button9 = (Button) findViewById(R.id.button9);
-        buttonOSCWrapperList.add(ButtonOSCWrapper.createInstance(8, "btn9", 
+        buttonOSCWrapperList.add(ButtonOSCWrapper.createInstance(8,
+                oscSettingsHashtable.containsKey("btn9-lbl") ? oscSettingsHashtable.get("btn9-lbl") : "btn9",
         		oscSettingsHashtable.get("btn9-butpres"), 
         		Boolean.parseBoolean(oscSettingsHashtable.get("btn9-trgbutrel")),
         		oscSettingsHashtable.get("btn9-butrel"),
         		button9, this));
         
         Button button10 = (Button) findViewById(R.id.button10);
-        buttonOSCWrapperList.add(ButtonOSCWrapper.createInstance(9, "btn10", 
+        buttonOSCWrapperList.add(ButtonOSCWrapper.createInstance(9,
+                oscSettingsHashtable.containsKey("btn10-lbl") ? oscSettingsHashtable.get("btn10-lbl") : "btn10",
         		oscSettingsHashtable.get("btn10-butpres"), 
         		Boolean.parseBoolean(oscSettingsHashtable.get("btn10-trgbutrel")),
         		oscSettingsHashtable.get("btn10-butrel"),
         		button10, this));
         
         Button button11 = (Button) findViewById(R.id.button11);
-        buttonOSCWrapperList.add(ButtonOSCWrapper.createInstance(10, "btn11", 
+        buttonOSCWrapperList.add(ButtonOSCWrapper.createInstance(10,
+                oscSettingsHashtable.containsKey("btn11-lbl") ? oscSettingsHashtable.get("btn11-lbl") : "btn11",
         		oscSettingsHashtable.get("btn11-butpres"), 
         		Boolean.parseBoolean(oscSettingsHashtable.get("btn11-trgbutrel")),
         		oscSettingsHashtable.get("btn11-butrel"),
         		button11, this));
         
         Button button12 = (Button) findViewById(R.id.button12);
-        buttonOSCWrapperList.add(ButtonOSCWrapper.createInstance(11, "btn12", 
+        buttonOSCWrapperList.add(ButtonOSCWrapper.createInstance(11,
+                oscSettingsHashtable.containsKey("btn12-lbl") ? oscSettingsHashtable.get("btn12-lbl") : "btn12",
         		oscSettingsHashtable.get("btn12-butpres"), 
         		Boolean.parseBoolean(oscSettingsHashtable.get("btn12-trgbutrel")),
         		oscSettingsHashtable.get("btn12-butrel"),
         		button12, this));
         
         Button button13 = (Button) findViewById(R.id.button13);
-        buttonOSCWrapperList.add(ButtonOSCWrapper.createInstance(12, "btn13", 
+        buttonOSCWrapperList.add(ButtonOSCWrapper.createInstance(12,
+                oscSettingsHashtable.containsKey("btn13-lbl") ? oscSettingsHashtable.get("btn13-lbl") : "btn13",
         		oscSettingsHashtable.get("btn13-butpres"), 
         		Boolean.parseBoolean(oscSettingsHashtable.get("btn13-trgbutrel")),
         		oscSettingsHashtable.get("btn13-butrel"),
         		button13, this));
         
         Button button14 = (Button) findViewById(R.id.button14);
-        buttonOSCWrapperList.add(ButtonOSCWrapper.createInstance(13, "btn14", 
+        buttonOSCWrapperList.add(ButtonOSCWrapper.createInstance(13,
+                oscSettingsHashtable.containsKey("btn14-lbl") ? oscSettingsHashtable.get("btn14-lbl") : "btn14",
         		oscSettingsHashtable.get("btn14-butpres"), 
         		Boolean.parseBoolean(oscSettingsHashtable.get("btn14-trgbutrel")),
         		oscSettingsHashtable.get("btn14-butrel"),
         		button14, this));
         
         Button button15 = (Button) findViewById(R.id.button15);
-        buttonOSCWrapperList.add(ButtonOSCWrapper.createInstance(14, "btn15", 
+        buttonOSCWrapperList.add(ButtonOSCWrapper.createInstance(14,
+                oscSettingsHashtable.containsKey("btn15-lbl") ? oscSettingsHashtable.get("btn15-lbl") : "btn15",
         		oscSettingsHashtable.get("btn15-butpres"), 
         		Boolean.parseBoolean(oscSettingsHashtable.get("btn15-trgbutrel")),
         		oscSettingsHashtable.get("btn15-butrel"),
         		button15, this));
         
         Button button16 = (Button) findViewById(R.id.button16);
-        buttonOSCWrapperList.add(ButtonOSCWrapper.createInstance(15, "btn16", 
+        buttonOSCWrapperList.add(ButtonOSCWrapper.createInstance(15,
+                oscSettingsHashtable.containsKey("btn16-lbl") ? oscSettingsHashtable.get("btn16-lbl") : "btn16",
         		oscSettingsHashtable.get("btn16-butpres"), 
         		Boolean.parseBoolean(oscSettingsHashtable.get("btn16-trgbutrel")),
         		oscSettingsHashtable.get("btn16-butrel"),
@@ -220,53 +236,71 @@ public class QuickOSCActivity extends FragmentActivity {
         
         
         ToggleButton toggle1 = (ToggleButton) findViewById(R.id.toggleButton1);
-        toggleOSCWrapperList.add(ToggleOSCWrapper.createInstance(0, "tog1", 
+        toggleOSCWrapperList.add(ToggleOSCWrapper.createInstance(0,
+                oscSettingsHashtable.containsKey("tog1-onlbl") ? oscSettingsHashtable.get("tog1-onlbl") : "tog1",
+                oscSettingsHashtable.containsKey("tog1-offlbl") ? oscSettingsHashtable.get("tog1-offlbl") : "tog1",
         		oscSettingsHashtable.get("tog1-togon"),
         		oscSettingsHashtable.get("tog1-togoff"),
         		toggle1, this));
         
         ToggleButton toggle2 = (ToggleButton) findViewById(R.id.toggleButton2);
-        toggleOSCWrapperList.add(ToggleOSCWrapper.createInstance(1, "tog2", 
-        		oscSettingsHashtable.get("tog2-togon"),
+        toggleOSCWrapperList.add(ToggleOSCWrapper.createInstance(1,
+                oscSettingsHashtable.containsKey("tog2-onlbl") ? oscSettingsHashtable.get("tog2-onlbl") : "tog2",
+                oscSettingsHashtable.containsKey("tog2-offlbl") ? oscSettingsHashtable.get("tog2-offlbl") : "tog2",
+                oscSettingsHashtable.get("tog2-togon"),
         		oscSettingsHashtable.get("tog2-togoff"),
         		toggle2, this));
         
         ToggleButton toggle3 = (ToggleButton) findViewById(R.id.toggleButton3);
-        toggleOSCWrapperList.add(ToggleOSCWrapper.createInstance(2, "tog3", 
-        		oscSettingsHashtable.get("tog3-togon"),
+        toggleOSCWrapperList.add(ToggleOSCWrapper.createInstance(2,
+                oscSettingsHashtable.containsKey("tog3-onlbl") ? oscSettingsHashtable.get("tog3-onlbl") : "tog3",
+                oscSettingsHashtable.containsKey("tog3-offlbl") ? oscSettingsHashtable.get("tog3-offlbl") : "tog3",
+                oscSettingsHashtable.get("tog3-togon"),
         		oscSettingsHashtable.get("tog3-togoff"),
         		toggle3, this));
         
         ToggleButton toggle4 = (ToggleButton) findViewById(R.id.toggleButton4);
-        toggleOSCWrapperList.add(ToggleOSCWrapper.createInstance(3, "tog4", 
-        		oscSettingsHashtable.get("tog4-togon"),
+        toggleOSCWrapperList.add(ToggleOSCWrapper.createInstance(3,
+                oscSettingsHashtable.containsKey("tog4-onlbl") ? oscSettingsHashtable.get("tog4-onlbl") : "tog4",
+                oscSettingsHashtable.containsKey("tog4-offlbl") ? oscSettingsHashtable.get("tog4-offlbl") : "tog4",
+                oscSettingsHashtable.get("tog4-togon"),
         		oscSettingsHashtable.get("tog4-togoff"),
         		toggle4, this));
         
         ToggleButton toggle5 = (ToggleButton) findViewById(R.id.toggleButton5);
-        toggleOSCWrapperList.add(ToggleOSCWrapper.createInstance(4, "tog5", 
-        		oscSettingsHashtable.get("tog5-togon"),
+        toggleOSCWrapperList.add(ToggleOSCWrapper.createInstance(4,
+                oscSettingsHashtable.containsKey("tog5-onlbl") ? oscSettingsHashtable.get("tog5-onlbl") : "tog5",
+                oscSettingsHashtable.containsKey("tog5-offlbl") ? oscSettingsHashtable.get("tog5-offlbl") : "tog5",
+                oscSettingsHashtable.get("tog5-togon"),
         		oscSettingsHashtable.get("tog5-togoff"),
         		toggle5, this));
         
         ToggleButton toggle6 = (ToggleButton) findViewById(R.id.toggleButton6);
-        toggleOSCWrapperList.add(ToggleOSCWrapper.createInstance(5, "tog6", 
-        		oscSettingsHashtable.get("tog6-togon"),
+        toggleOSCWrapperList.add(ToggleOSCWrapper.createInstance(5,
+                oscSettingsHashtable.containsKey("tog6-onlbl") ? oscSettingsHashtable.get("tog6-onlbl") : "tog6",
+                oscSettingsHashtable.containsKey("tog6-offlbl") ? oscSettingsHashtable.get("tog6-offlbl") : "tog6",
+                oscSettingsHashtable.get("tog6-togon"),
         		oscSettingsHashtable.get("tog6-togoff"),
         		toggle6, this));
         
         ToggleButton toggle7 = (ToggleButton) findViewById(R.id.toggleButton7);
-        toggleOSCWrapperList.add(ToggleOSCWrapper.createInstance(6, "tog7", 
-        		oscSettingsHashtable.get("tog7-togon"),
+        toggleOSCWrapperList.add(ToggleOSCWrapper.createInstance(6,
+                oscSettingsHashtable.containsKey("tog7-onlbl") ? oscSettingsHashtable.get("tog7-onlbl") : "tog7",
+                oscSettingsHashtable.containsKey("tog7-offlbl") ? oscSettingsHashtable.get("tog7-offlbl") : "tog7",
+                oscSettingsHashtable.get("tog7-togon"),
         		oscSettingsHashtable.get("tog7-togoff"),
         		toggle7, this));
         
         ToggleButton toggle8 = (ToggleButton) findViewById(R.id.toggleButton8);
-        toggleOSCWrapperList.add(ToggleOSCWrapper.createInstance(7, "tog8", 
-        		oscSettingsHashtable.get("tog8-togon"),
+        toggleOSCWrapperList.add(ToggleOSCWrapper.createInstance(7,
+                oscSettingsHashtable.containsKey("tog8-onlbl") ? oscSettingsHashtable.get("tog8-onlbl") : "tog8",
+                oscSettingsHashtable.containsKey("tog8-offlbl") ? oscSettingsHashtable.get("tog8-offlbl") : "tog8",
+                oscSettingsHashtable.get("tog8-togon"),
         		oscSettingsHashtable.get("tog8-togoff"),
         		toggle8, this));
-        
+
+
+
         SeekBar seekBar1 = (SeekBar) findViewById(R.id.seekBar1);
         seekBarOSCWrapperList.add(SeekBarOSCWrapper.createInstance(0, "seekBar1",
         		oscSettingsHashtable.get("seekBar1-valcng"),
@@ -333,6 +367,9 @@ public class QuickOSCActivity extends FragmentActivity {
                     }
                 }
             }
+            else if(action.equals("label")) {
+                btn.setName(Utils.convertToString(message.getArguments()));
+            }
             }
         };
 
@@ -368,6 +405,12 @@ public class QuickOSCActivity extends FragmentActivity {
                         }
                     }
                 }
+            }
+            else if(action.equals("labelOn")) {
+                btn.setOnLabel(Utils.convertToString(message.getArguments()));
+            }
+            else if(action.equals("labelOff")) {
+                btn.setOffLabel(Utils.convertToString(message.getArguments()));
             }
             }
         };
@@ -512,6 +555,7 @@ public class QuickOSCActivity extends FragmentActivity {
     		
 			Intent intent = new Intent(this, ButtonOSCSettingActivity.class);
 			intent.setAction("com.ahmetkizilay.controls.osc.ButtonOSCSetter");
+            intent.putExtra("label", selectedButton.getName());
 			intent.putExtra("msgButtonPressed", selectedButton.getMessageButtonPressedRaw());
 			intent.putExtra("msgButtonReleased", selectedButton.getMessageButtonReleasedRaw());
 			intent.putExtra("trigButtonReleased", selectedButton.getTriggerWhenButtonReleased());
@@ -536,6 +580,8 @@ public class QuickOSCActivity extends FragmentActivity {
     		
 			Intent intent = new Intent(this, ToggleOSCSettingActivity.class);
 			intent.setAction("com.ahmetkizilay.controls.osc.ToggleOSCSetter");
+            intent.putExtra("onLabel", selectedToggle.getOnLabel());
+            intent.putExtra("offLabel", selectedToggle.getOffLabel());
 			intent.putExtra("msgToggleOn", selectedToggle.getMessageToggleOnRaw());
 			intent.putExtra("msgToggleOff", selectedToggle.getMessageToggleOffRaw());
 			intent.putExtra("index", selectedToggle.getIndex());
@@ -604,13 +650,15 @@ public class QuickOSCActivity extends FragmentActivity {
      * @param intent
      */
     private void handleButtonOSCSettingResult(Intent intent) {
-    	
+
+        String label = intent.getExtras().get("label").toString();
 		String msgButtonPressed = intent.getExtras().get("msgButtonPressed").toString();
 		String msgButtonReleased = (String) intent.getExtras().get("msgButtonReleased").toString();
 		boolean trigButtonReleased = Boolean.parseBoolean(intent.getExtras().get("trigButtonReleased").toString());
 		int indexSelectedButton = Integer.parseInt(intent.getExtras().get("index").toString());
 		
 		ButtonOSCWrapper selectedButton = this.buttonOSCWrapperList.get(indexSelectedButton);
+        selectedButton.setName(label);
 		selectedButton.setMessageButtonPressed(msgButtonPressed);
 		selectedButton.setMessageButtonReleased(msgButtonReleased);
 		selectedButton.setTriggerWhenButtonReleased(trigButtonReleased);
@@ -623,12 +671,15 @@ public class QuickOSCActivity extends FragmentActivity {
      * @param intent
      */
     private void handleToggleOSCSettingResult(Intent intent) {
-    	
+    	String onLabel = intent.getExtras().get("onLabel").toString();
+        String offLabel = intent.getExtras().get("offLabel").toString();
 		String msgToggleOn = intent.getExtras().get("msgToggleOn").toString();
-		String msgToggleOff = (String) intent.getExtras().get("msgToggleOff").toString();
+		String msgToggleOff = intent.getExtras().get("msgToggleOff").toString();
 		int selectedIndex = Integer.parseInt(intent.getExtras().get("index").toString());
 		
 		ToggleOSCWrapper selectedToggle = toggleOSCWrapperList.get(selectedIndex);
+        selectedToggle.setOnLabel(onLabel);
+        selectedToggle.setOffLabel(offLabel);
 		selectedToggle.setMessageToggleOn(msgToggleOn);
 		selectedToggle.setMessageToggleOff(msgToggleOff);
 		
@@ -1039,11 +1090,17 @@ public class QuickOSCActivity extends FragmentActivity {
                 mListenIncoming = Boolean.parseBoolean(pieces[2]);
                 inPort = Integer.parseInt(pieces[3]);
             }
+            else {
+                mListenIncoming = false;
+                inPort = 8090;
+            }
     	}
     	catch(FileNotFoundException fnfe) {}
     	catch(Exception exp) {
     		Toast.makeText(this, "Could Not Read SCAuth File", Toast.LENGTH_SHORT).show();
     		ipAddress = "127.0.0.1"; port = 8000;
+            mListenIncoming = false;
+            inPort = 8090;
     	}
     }
     
@@ -1084,15 +1141,18 @@ public class QuickOSCActivity extends FragmentActivity {
         		StringBuffer dataBuffer = new StringBuffer();
         		for(int i = 0; i < buttonOSCWrapperList.size(); i++) {
         			ButtonOSCWrapper thisButtonWrapper = buttonOSCWrapperList.get(i);
-        			dataBuffer.append(thisButtonWrapper.getName() + "-butpres" + "#x#x#" + thisButtonWrapper.getMessageButtonPressedRaw() + "#x#x#");
-        			dataBuffer.append(thisButtonWrapper.getName() + "-trgbutrel" + "#x#x#" + thisButtonWrapper.getTriggerWhenButtonReleased() + "#x#x#");
-        			dataBuffer.append(thisButtonWrapper.getName() + "-butrel" + "#x#x#" + thisButtonWrapper.getMessageButtonReleasedRaw() + "#x#x#");
+                    dataBuffer.append("btn" + (i+1) + "-lbl"       + "#x#x#" + thisButtonWrapper.getName() + "#x#x#");
+                    dataBuffer.append("btn" + (i+1) + "-butpres"   + "#x#x#" + thisButtonWrapper.getMessageButtonPressedRaw() + "#x#x#");
+                    dataBuffer.append("btn" + (i+1) + "-trgbutrel" + "#x#x#" + thisButtonWrapper.getTriggerWhenButtonReleased() + "#x#x#");
+                    dataBuffer.append("btn" + (i+1) + "-butrel"    + "#x#x#" + thisButtonWrapper.getMessageButtonReleasedRaw() + "#x#x#");
         		}
         		
         		for(int i = 0; i < toggleOSCWrapperList.size(); i++) {
         			ToggleOSCWrapper thisToggleOSCWrapper = toggleOSCWrapperList.get(i);
-        			dataBuffer.append(thisToggleOSCWrapper.getName() + "-togon" + "#x#x#" + thisToggleOSCWrapper.getMessageToggleOnRaw() + "#x#x#");
-        			dataBuffer.append(thisToggleOSCWrapper.getName() + "-togoff" + "#x#x#" + thisToggleOSCWrapper.getMessageToggleOffRaw() + "#x#x#");
+                    dataBuffer.append("tog" + (i+1) + "-onlbl" + "#x#x#" + thisToggleOSCWrapper.getOnLabel() + "#x#x#");
+                    dataBuffer.append("tog" + (i+1) + "-offlbl" + "#x#x#" + thisToggleOSCWrapper.getOffLabel() + "#x#x#");
+        			dataBuffer.append("tog" + (i+1) + "-togon" + "#x#x#" + thisToggleOSCWrapper.getMessageToggleOnRaw() + "#x#x#");
+        			dataBuffer.append("tog" + (i+1) + "-togoff" + "#x#x#" + thisToggleOSCWrapper.getMessageToggleOffRaw() + "#x#x#");
         		}
         		
         		for(int i = 0; i < seekBarOSCWrapperList.size(); i++) {
