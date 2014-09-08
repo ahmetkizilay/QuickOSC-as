@@ -4,6 +4,9 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ToggleButton;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * ToggleOSCWrappper
  * This is the wrapper class for ToggleButton controls.
@@ -16,14 +19,15 @@ public class ToggleOSCWrapper implements OnCheckedChangeListener{
 	private QuickOSCActivity parentActivity;
 	
 	private String messageToggleOnAddr;
-	private Object[] messageToggleOnArgs;
+	private List<Object> messageToggleOnArgs;
 	private String messageToggleOnRaw;
 	
 	private String messageToggleOffAddr;
-	private Object[] messageToggleOffArgs;
+	private List<Object> messageToggleOffArgs;
 	private String messageToggleOffRaw;
 	private String name;
-	
+
+   private ToggleButton toggle;
 	private int index;
 	
 	/**
@@ -54,11 +58,11 @@ public class ToggleOSCWrapper implements OnCheckedChangeListener{
 		this.messageToggleOffArgs = null;
 		this.messageToggleOffRaw = this.messageToggleOffAddr;
 		
-		
-		button.setOnCheckedChangeListener(this);
-		button.setText(name);
-		button.setTextOn(name);
-		button.setTextOff(name);
+		this.toggle = button;
+		this.toggle.setOnCheckedChangeListener(this);
+        this.toggle.setText(name);
+        this.toggle.setTextOn(name);
+        this.toggle.setTextOff(name);
 	}
 	
 	private ToggleOSCWrapper(int index, String name, String msgToggleOn, String msgToggleOff, ToggleButton button, QuickOSCActivity parentActivity) {
@@ -68,12 +72,12 @@ public class ToggleOSCWrapper implements OnCheckedChangeListener{
 
 		this.setMessageToggleOn(msgToggleOn);
 		this.setMessageToggleOff(msgToggleOff);
-		
-		
-		button.setOnCheckedChangeListener(this);
-		button.setText(name);
-		button.setTextOn(name);
-		button.setTextOff(name);
+
+        this.toggle = button;
+        this.toggle.setOnCheckedChangeListener(this);
+        this.toggle.setText(name);
+        this.toggle.setTextOn(name);
+        this.toggle.setTextOff(name);
 	}
 
 	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -109,9 +113,9 @@ public class ToggleOSCWrapper implements OnCheckedChangeListener{
 			String[] messageToggleOnParts = messageToggleOn.split(" ");
 			this.messageToggleOnAddr = messageToggleOnParts[0];
 			if(messageToggleOnParts.length > 0) {
-				this.messageToggleOnArgs = new Object[messageToggleOnParts.length - 1];
+				this.messageToggleOnArgs = new ArrayList<Object>();
 				for(int i = 1; i < messageToggleOnParts.length; i++) {
-					this.messageToggleOnArgs[i - 1] = Utils.simpleParse(messageToggleOnParts[i]);
+					this.messageToggleOnArgs.add(Utils.simpleParse(messageToggleOnParts[i]));
 				}
 			}
 		}
@@ -133,13 +137,21 @@ public class ToggleOSCWrapper implements OnCheckedChangeListener{
 			String[] messageToggleOffParts = messageToggleOff.split(" ");
 			this.messageToggleOffAddr = messageToggleOffParts[0];
 			if(messageToggleOffParts.length > 0) {
-				this.messageToggleOffArgs = new Object[messageToggleOffParts.length - 1];
+				this.messageToggleOffArgs = new ArrayList<Object>();
 				for(int i = 1; i < messageToggleOffParts.length; i++) {
-					this.messageToggleOffArgs[i - 1] = Utils.simpleParse(messageToggleOffParts[i]);
+					this.messageToggleOffArgs.add(Utils.simpleParse(messageToggleOffParts[i]));
 				}
 			}
 		}
 	}
+
+    public void setToggled(final boolean toggled) {
+        this.parentActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                ToggleOSCWrapper.this.toggle.setChecked(toggled);
+            }
+        });
+    }
 	
 	public String getName() {
 		return this.name;

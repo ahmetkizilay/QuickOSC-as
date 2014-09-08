@@ -6,7 +6,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.net.InetAddress;
+import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -16,14 +18,13 @@ import com.ahmetkizilay.controls.osc.fragments.PromoDialogFragment;
 import com.ahmetkizilay.controls.osc.fragments.WifiSettingsDialogFragment;
 import com.ahmetkizilay.modules.donations.PaymentDialogFragment;
 import com.ahmetkizilay.modules.donations.ThankYouDialogFragment;
+import com.illposed.osc.OSCListener;
 import com.illposed.osc.OSCMessage;
+import com.illposed.osc.OSCPortIn;
 import com.illposed.osc.OSCPortOut;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -36,6 +37,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -81,20 +83,26 @@ public class QuickOSCActivity extends FragmentActivity {
 
     private String ipAddress = "127.0.0.1";
     private int port = 8000;
-    private OSCPortOut oscPortOut = null;    
-    
+    private OSCPortOut oscPortOut = null;
+
+    private boolean mListenIncoming = true;
+    private int inPort = 3234;
+    private OSCPortIn oscPortIn;
+
+    private OSCListener btnListener;
+    private OSCListener toggleListener;
+    private OSCListener seekBarListener;
+    private OSCListener saveListener;
+
 	TextView debugTextView;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        
-        
-		restoreNetworkSettingsFromFile();
+
 		restoreOSCSettingsFromFile();
-        initializeOSC();
-        
+
         debugTextView = (TextView) findViewById(R.id.textView1);
         
         Button button1 = (Button) findViewById(R.id.button1);
@@ -288,6 +296,164 @@ public class QuickOSCActivity extends FragmentActivity {
         		seekBar4, this));
 
 
+
+
+
+        // DEFINING OSC LISTENERS HERE
+        this.btnListener = new OSCListener() {
+            public void acceptMessage(java.util.Date time, OSCMessage message) {
+            String[] addressParts = message.getAddress().split("/");
+            int index = extractIndex(addressParts[1], "btn");
+            if(index < 1 || index > 16) {
+                return;
+            }
+            ButtonOSCWrapper btn = buttonOSCWrapperList.get(index - 1);
+
+            String action = addressParts[2];
+
+            if(action.equals("msgButtonPressed")) {
+                btn.setMessageButtonPressed(Utils.convertToString(message.getArguments()));
+            }
+            else if(action.equals("msgButtonReleased")) {
+                btn.setMessageButtonReleased(Utils.convertToString(message.getArguments()));
+            }
+            else if(action.equals("triggerOnButtonReleased")) {
+                // only check the first arguments
+                List<Object> arguments = message.getArguments();
+                if(arguments.size() > 0) {
+                    Object value = arguments.get(0);
+                    if(value instanceof Integer) {
+                        int intValue = ((Integer) value).intValue();
+                        if(intValue == 0) {
+                            btn.setTriggerWhenButtonReleased(false);
+                        }
+                        else if(intValue == 1) {
+                            btn.setTriggerWhenButtonReleased(true);
+                        }
+                    }
+                }
+            }
+            }
+        };
+
+        this.toggleListener = new OSCListener() {
+            public void acceptMessage(java.util.Date time, OSCMessage message) {
+            String[] addressParts = message.getAddress().split("/");
+            int index = extractIndex(addressParts[1], "tog");
+            if(index < 1 || index > 8) {
+                return;
+            }
+            ToggleOSCWrapper btn = toggleOSCWrapperList.get(index - 1);
+
+            String action = addressParts[2];
+
+            if(action.equals("msgToggledOn")) {
+                btn.setMessageToggleOn(Utils.convertToString(message.getArguments()));
+            }
+            else if(action.equals("msgToggledOff")) {
+                btn.setMessageToggleOff(Utils.convertToString(message.getArguments()));
+            }
+            else if(action.equals("value")) {
+                // only check the first arguments
+                List<Object> arguments = message.getArguments();
+                if(arguments.size() > 0) {
+                    Object value = arguments.get(0);
+                    if(value instanceof Integer) {
+                        int intValue = ((Integer) value).intValue();
+                        if(intValue == 0) {
+                            btn.setToggled(false);
+                        }
+                        else if(intValue == 1) {
+                            btn.setToggled(true);
+                        }
+                    }
+                }
+            }
+            }
+        };
+
+        this.seekBarListener = new OSCListener() {
+            public void acceptMessage(java.util.Date time, OSCMessage message) {
+            String[] addressParts = message.getAddress().split("/");
+            int index = extractIndex(addressParts[1], "sb");
+            if(index < 1 || index > 4) {
+                return;
+            }
+            SeekBarOSCWrapper seekBar = seekBarOSCWrapperList.get(index - 1);
+
+            String action = addressParts[2];
+
+            if(action.equals("msgValueChanged")) {
+                seekBar.setMsgValueChanged(Utils.convertToString(message.getArguments()));
+            }
+            else if(action.equals("range")) {
+                List<Object> arguments = message.getArguments();
+                if(arguments.size() < 2) {
+                    return;
+                }
+                float minValue = 0f;
+                float maxValue = 0f;
+                try {
+                    if(arguments.get(0) instanceof Integer) {
+                        minValue = (float) ((Integer) arguments.get(0)).intValue();
+                    }
+                    else if(arguments.get(0) instanceof Float) {
+                        minValue = ((Float) arguments.get(0)).floatValue();
+                    }
+                    else {
+                        return;
+                    }
+
+                    if(arguments.get(1) instanceof Integer) {
+                        maxValue = (float) ((Integer) arguments.get(1)).intValue();
+                    }
+                    else if(arguments.get(1) instanceof Float) {
+                        maxValue = ((Float) arguments.get(1)).floatValue();
+                    }
+                    else {
+                        return;
+                    }
+                }
+                catch(NumberFormatException nfe) {
+                    return;
+                }
+                seekBar.setMinValue(minValue);
+                seekBar.setMaxValue(maxValue);
+            }
+            else if(action.equals("value")) {
+                List<Object> arguments = message.getArguments();
+                if(arguments.size() < 1) {
+                    return;
+                }
+                float value = 0f;
+                try {
+                    if(arguments.get(0) instanceof Integer) {
+                        value = (float)((Integer) arguments.get(0)).intValue();
+                    }
+                    else if(arguments.get(0) instanceof Float) {
+                        value = ((Float) arguments.get(0)).floatValue();
+                    }
+                    else {
+                        return;
+                    }
+
+                }
+                catch(NumberFormatException nfe) {
+                    return;
+                }
+                seekBar.setValue(value);
+            }
+            }
+        };
+
+        this.saveListener = new OSCListener() {
+            public void acceptMessage(Date date, OSCMessage oscMessage) {
+                saveOSCSettingsIntoFile();
+            }
+        };
+
+
+        // showing the promo for AndrOSC
         SharedPreferences settings = getSharedPreferences(PREF_FILE, 0);
         boolean dialogShown = settings.getBoolean(PROMO_SHOWN, false);
 
@@ -297,8 +463,30 @@ public class QuickOSCActivity extends FragmentActivity {
             showAndrOSCPromo();
         }
     }
-    
-    
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        if(this.oscPortIn != null && this.oscPortIn.isListening()) {
+            this.oscPortIn.stopListening();
+            this.oscPortIn.close();
+        }
+
+        if(this.oscPortOut != null) {
+            this.oscPortOut.close();
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        restoreNetworkSettingsFromFile();
+        initializeOSC();
+        initializeIncomingOSC();
+    }
+
     public boolean isEditMode() {
     	return this.editMode;
     }
@@ -673,14 +861,16 @@ public class QuickOSCActivity extends FragmentActivity {
         }
         ft.addToBackStack(null);
 
-        final NetworkDialogFragment frg = NetworkDialogFragment.newInstance(ipAddress, port);
+        final NetworkDialogFragment frg = NetworkDialogFragment.newInstance(ipAddress, port, mListenIncoming, Utils.getIpAddress(true), inPort);
         frg.setNetworkDialogListener(new NetworkDialogFragment.NetworkDialogListener() {
-            public void onSettingsSaved(String ipAddress, int port) {
+            public void onSettingsSaved(String ipAddress, int port, boolean listenIncoming, int inPort) {
                 QuickOSCActivity.this.ipAddress = ipAddress;
                 QuickOSCActivity.this.port = port;
+                QuickOSCActivity.this.inPort = inPort;
 
                 saveNetworkSettinsIntoFile();
                 initializeOSC();
+                initializeIncomingOSC();
             }
         });
         frg.show(ft, NETWORK_DIALOG);
@@ -720,13 +910,65 @@ public class QuickOSCActivity extends FragmentActivity {
     		oscPortOut = null;
     	}
     }
+
+    /**
+     * Initializes the OSCPortIn class with with the given port
+     * called from onStart method
+     *
+     * AVAILABLE MESSAGE FORMATS
+     *
+     * for Button controller, N = {1..16}
+     * /btnN/msgButtonPressed <args ...>
+     * /btnN/msgButtonReleased <args..>
+     * /btnN/triggerOnButtonReleased <1/0>
+     *
+     * for Toggle controllers, N = {1..8}
+     * /togN/msgToggledOn <args >
+     * /togN/msgToggledOff <args>
+     * /togN/value <1/0>
+     *
+     * for SeekBar controllers, N = {1..4}
+     * /sbN/range <min> <max>
+     * /sbN/msgValueChanged <args>
+     * /sbN/value <val>
+     *
+     * To save OSC settings
+     * /save
+     */
+    private void initializeIncomingOSC() {
+        if(this.oscPortIn != null) {
+            if(this.oscPortIn.isListening()) {
+                this.oscPortIn.stopListening();
+            }
+
+            this.oscPortIn.close();
+            this.oscPortIn = null;
+
+        }
+
+        if(!this.mListenIncoming) {
+            return;
+        }
+
+        try {
+            this.oscPortIn = new OSCPortIn(this.inPort);
+            this.oscPortIn.addListener("/btn*/*", btnListener);
+            this.oscPortIn.addListener("/tog*/*", toggleListener);
+            this.oscPortIn.addListener("/sb*/*", seekBarListener);
+            this.oscPortIn.addListener("/save", saveListener);
+            this.oscPortIn.startListening();
+        }
+        catch(SocketException se) {
+            se.printStackTrace();
+            Log.d("QuickOSCActivity", se.getMessage());
+        }
+    }
     
     /**
      * Sends the OSC message passed by the Wrappers. Requires a successful initializeOSC() method
      * to be able to access the host.
      * @param message
      */
-    
     public void sendOSC(String message) {    	
     	try {    		
 	    	new AsyncSendOSCTask(this, this.oscPortOut).execute(new OSCMessage(message));	    	
@@ -743,7 +985,7 @@ public class QuickOSCActivity extends FragmentActivity {
      * @param arguments
      */
     
-    public void sendOSC(String address, Object[] arguments) {    	
+    public void sendOSC(String address, List<Object> arguments) {
     	try {    		
 	    	new AsyncSendOSCTask(this, this.oscPortOut).execute(new OSCMessage(address, arguments));	    	
     	}
@@ -761,7 +1003,7 @@ public class QuickOSCActivity extends FragmentActivity {
     		try {
         		FileOutputStream fos = openFileOutput(NETWORK_SETTINGS_FILE, Context.MODE_PRIVATE);
         		
-        		String data = ipAddress + "#" + port;
+        		String data = ipAddress + "#" + port + "#" + mListenIncoming + "#" + inPort;
         		fos.write(data.getBytes());
         		fos.close();
         	}
@@ -793,7 +1035,10 @@ public class QuickOSCActivity extends FragmentActivity {
     		
     		ipAddress = pieces[0];
     		port = Integer.parseInt(pieces[1]);
-    		
+            if(pieces.length > 2) {
+                mListenIncoming = Boolean.parseBoolean(pieces[2]);
+                inPort = Integer.parseInt(pieces[3]);
+            }
     	}
     	catch(FileNotFoundException fnfe) {}
     	catch(Exception exp) {
@@ -901,5 +1146,25 @@ public class QuickOSCActivity extends FragmentActivity {
     	}
 
         return true;
+    }
+
+    /**
+     * A utility method to extract the id from the OSC address.
+     * @param str the first part of the original OSC address
+     * @param prefix the address starts with either btn, tog or sb
+     * @return the number after the prefix, 0 if something is wrong
+     */
+    private int extractIndex(String str, String prefix) {
+        int result;
+        try {
+            result = Integer.parseInt(str.substring(prefix.length()), 10);
+            if(result < 1) {
+                return 0;
+            }
+
+            return result;
+        }
+        catch(NumberFormatException nfe) {}
+        return 0;
     }
 }

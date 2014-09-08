@@ -3,6 +3,9 @@ package com.ahmetkizilay.controls.osc;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * SeekBarOSCWrappper
  * This is the wrapper class for SeekBar controls.
@@ -24,8 +27,9 @@ public class SeekBarOSCWrapper implements OnSeekBarChangeListener {
 	
 	/**
 	 * Default constructor publicly available for other classes.
+     * @param index
 	 * @param name Only used to set the default OSC message.
-	 * @param button
+	 * @param seekBar
 	 * @param parentActivity
 	 * @return
 	 */
@@ -63,11 +67,11 @@ public class SeekBarOSCWrapper implements OnSeekBarChangeListener {
 			String message = msgValueChanged.replace("$", Float.toString(val));
 
 			String[] messageParts = message.split(" ");
-			Object[] arguments = null;
+			List<Object> arguments = null;
 			if(messageParts.length > 0) {
-				arguments = new Object[messageParts.length - 1];
+				arguments = new ArrayList<Object>();
 				for(int i = 1; i < messageParts.length; i++) {
-					arguments[i - 1] = Utils.simpleParse(messageParts[i]);
+					arguments.add(Utils.simpleParse(messageParts[i]));
 				}
 			}
 			
@@ -129,5 +133,26 @@ public class SeekBarOSCWrapper implements OnSeekBarChangeListener {
 	public int getIndex() {
 		return this.index;
 	}
+
+    public void setValue(float value) {
+        if(minValue == maxValue) { // just to avoid that divide by zero error;
+            this.parentActivity.runOnUiThread(new Runnable() {
+                public void run() {
+                    SeekBarOSCWrapper.this.seekBar.setProgress(0);
+                }
+            });
+
+            return;
+        }
+
+        float myVal = Math.max(Math.min(maxValue, value), minValue);
+        final float resVal = ((myVal - minValue) * 100) / (maxValue - minValue);
+        this.parentActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                SeekBarOSCWrapper.this.seekBar.setProgress((int) Math.floor(resVal));
+            }
+        });
+
+    }
 	
 }

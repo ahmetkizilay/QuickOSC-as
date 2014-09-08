@@ -5,6 +5,9 @@ import android.view.View;
 import android.view.View.OnTouchListener;
 import android.widget.Button;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 /**
  * ButtonOSCWrappper
@@ -23,11 +26,11 @@ public class ButtonOSCWrapper implements OnTouchListener{
 	private int index = 0;
 	
 	private String messageButtonPressedAddr = "";
-	private Object[] messageButtonPressedArgs = null;
+	private List<Object> messageButtonPressedArgs = null;
 	private String messageButtonPressedRaw;
 	
 	private String messageButtonReleasedAddr = "";
-	private Object[] messageButtonReleasedArgs = null;
+	private List<Object> messageButtonReleasedArgs = null;
 	private String messageButtonReleasedRaw;
 	
 	private String name;
@@ -88,7 +91,6 @@ public class ButtonOSCWrapper implements OnTouchListener{
 		}
 		else if(event.getAction() == MotionEvent.ACTION_UP) {
 			if(parentActivity.isEditMode()) {
-				System.out.println("naber");
 				parentActivity.callButtonOSCSetter(this);
 			}
 			else if(this.triggerWhenButtonReleased) {
@@ -114,9 +116,9 @@ public class ButtonOSCWrapper implements OnTouchListener{
 			String[] msgButtonPressedParts = messageButtonPressed.split(" ");
 			this.messageButtonPressedAddr = msgButtonPressedParts[0];
 			if(msgButtonPressedParts.length > 0) {
-				this.messageButtonPressedArgs = new Object[msgButtonPressedParts.length - 1];
+				this.messageButtonPressedArgs = new ArrayList<Object>();
 				for(int i = 1; i < msgButtonPressedParts.length; i++) {
-					this.messageButtonPressedArgs[i - 1] = Utils.simpleParse(msgButtonPressedParts[i]);
+					this.messageButtonPressedArgs.add(Utils.simpleParse(msgButtonPressedParts[i]));
 				}
 			}
 		}
@@ -134,9 +136,9 @@ public class ButtonOSCWrapper implements OnTouchListener{
 			String[] msgButtonReleasedParts = messageButtonReleased.split(" ");
 			this.messageButtonReleasedAddr = msgButtonReleasedParts[0];
 			if(msgButtonReleasedParts.length > 0) {
-				this.messageButtonReleasedArgs = new Object[msgButtonReleasedParts.length - 1];
+				this.messageButtonReleasedArgs = new ArrayList<Object>();
 				for(int i = 1; i < msgButtonReleasedParts.length; i++) {
-					this.messageButtonReleasedArgs[i - 1] = Utils.simpleParse(msgButtonReleasedParts[i]);
+					this.messageButtonReleasedArgs.add(Utils.simpleParse(msgButtonReleasedParts[i]));
 				}
 			}
 		}
