@@ -136,10 +136,10 @@ public class ToggleOSCWrapper implements OnCheckedChangeListener{
         this.onLabel = onLabel;
         this.parentActivity.runOnUiThread(new Runnable() {
             public void run() {
-                if(ToggleOSCWrapper.this.toggle.isChecked()) {
-                    ToggleOSCWrapper.this.toggle.setText(ToggleOSCWrapper.this.onLabel);
-                }
-                ToggleOSCWrapper.this.toggle.setTextOn(ToggleOSCWrapper.this.onLabel);
+            if(ToggleOSCWrapper.this.toggle.isChecked()) {
+                ToggleOSCWrapper.this.toggle.setText(ToggleOSCWrapper.this.onLabel);
+            }
+            ToggleOSCWrapper.this.toggle.setTextOn(ToggleOSCWrapper.this.onLabel);
             }
         });
     }
@@ -148,10 +148,10 @@ public class ToggleOSCWrapper implements OnCheckedChangeListener{
         this.offLabel = offLabel;
         this.parentActivity.runOnUiThread(new Runnable() {
             public void run() {
-                if(!ToggleOSCWrapper.this.toggle.isChecked()) {
-                    ToggleOSCWrapper.this.toggle.setText(ToggleOSCWrapper.this.offLabel);
-                }
-                ToggleOSCWrapper.this.toggle.setTextOff(ToggleOSCWrapper.this.offLabel);
+            if(!ToggleOSCWrapper.this.toggle.isChecked()) {
+                ToggleOSCWrapper.this.toggle.setText(ToggleOSCWrapper.this.offLabel);
+            }
+            ToggleOSCWrapper.this.toggle.setTextOff(ToggleOSCWrapper.this.offLabel);
             }
         });
     }

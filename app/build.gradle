@@ -1,10 +1,9 @@
 import groovy.json.JsonSlurper
 
 def keyFile = null
-if(new File("keys.json").exists()) {
+if (new File("keys.json").exists()) {
     keyFile = new File("keys.json")
-}
-else {
+} else {
     keyFile = new File("../keys.json");
 }
 
@@ -43,6 +42,12 @@ android {
         }
     }
     productFlavors {
+    }
+    sourceSets {
+        main {
+            java.srcDirs = ['src/main/java', 'src/tests']
+            assets.srcDirs = ['src/main/assets', 'src/tests/assets']
+        }
     }
 }
 

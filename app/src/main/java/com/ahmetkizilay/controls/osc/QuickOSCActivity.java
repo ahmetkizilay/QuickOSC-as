@@ -78,7 +78,7 @@ public class QuickOSCActivity extends FragmentActivity {
     private List<ToggleOSCWrapper> toggleOSCWrapperList = new ArrayList<ToggleOSCWrapper>();
     private List<SeekBarOSCWrapper> seekBarOSCWrapperList = new ArrayList<SeekBarOSCWrapper>();
     private Hashtable<String, String> oscSettingsHashtable = new Hashtable<String, String>();
-    
+
     private boolean editMode = false;
 
     private String ipAddress = "127.0.0.1";
@@ -508,11 +508,13 @@ public class QuickOSCActivity extends FragmentActivity {
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onPause() {
+        super.onPause();
 
-        if(this.oscPortIn != null && this.oscPortIn.isListening()) {
-            this.oscPortIn.stopListening();
+        if(this.oscPortIn != null) {
+            if(this.oscPortIn.isListening()) {
+                this.oscPortIn.stopListening();
+            }
             this.oscPortIn.close();
         }
 
@@ -522,8 +524,8 @@ public class QuickOSCActivity extends FragmentActivity {
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
+    protected void onResume() {
+        super.onResume();
 
         restoreNetworkSettingsFromFile();
         initializeOSC();
@@ -1120,7 +1122,7 @@ public class QuickOSCActivity extends FragmentActivity {
     		String[] pieces = data.split("#x#x#");
     		
     		for(int i = 0; i < pieces.length; i+=2) {
-    			oscSettingsHashtable.put(pieces[i], pieces[i+1]);
+    			oscSettingsHashtable.put(pieces[i].trim(), pieces[i+1].trim());
     		}
     	}
     	catch(FileNotFoundException fnfe) {}
@@ -1226,5 +1228,17 @@ public class QuickOSCActivity extends FragmentActivity {
         }
         catch(NumberFormatException nfe) {}
         return 0;
+    }
+
+    public List<ButtonOSCWrapper> getButtonWrappers() {
+        return this.buttonOSCWrapperList;
+    }
+
+    public List<ToggleOSCWrapper> getToggleWrappers() {
+        return this.toggleOSCWrapperList;
+    }
+
+    public List<SeekBarOSCWrapper> getSeekBarWrappers() {
+        return this.seekBarOSCWrapperList;
     }
 }
