@@ -2,6 +2,7 @@ package com.ahmetkizilay.controls.osc;
 
 import android.content.Intent;
 import android.test.ActivityUnitTestCase;
+import android.widget.SeekBar;
 
 import com.ahmetkizilay.controls.osc.mock.QuickOSCMockContext;
 import com.illposed.osc.OSCMessage;
@@ -17,9 +18,9 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by ahmetkizilay on 09.09.2014.
  */
-public class QuickOSCButtonOSCTesting extends ActivityUnitTestCase<QuickOSCActivity> {
+public class QuickOSCToggleOSCTesting extends ActivityUnitTestCase<QuickOSCActivity> {
 
-    public QuickOSCButtonOSCTesting() {
+    public QuickOSCToggleOSCTesting() {
         super(QuickOSCActivity.class);
     }
 
@@ -34,7 +35,7 @@ public class QuickOSCButtonOSCTesting extends ActivityUnitTestCase<QuickOSCActiv
         super.setUp();
 
         QuickOSCMockContext mockContext = new QuickOSCMockContext(getInstrumentation().getTargetContext());
-        mockContext.setFixtureName("btn1_fixtures.txt");
+        mockContext.setFixtureName("tog1_fixtures.txt");
         setActivityContext(mockContext);
         startActivity(new Intent(), null, null);
 
@@ -67,11 +68,57 @@ public class QuickOSCButtonOSCTesting extends ActivityUnitTestCase<QuickOSCActiv
     }
 
     /**
-     * Testing /btnN/msgButtonPressed
+     * Testing /togN/labelOn
      */
-    public void testSettingMsgButtonPressedValueWithOSC() throws IOException {
-        ButtonOSCWrapper btn = getActivity().getButtonWrappers().get(0);
-        assertEquals("Initially btn should be equal to the value in fixture", "/btn1/1", btn.getMessageButtonPressedRaw());
+    public void testSettingLabelOnWithOSC() throws IOException {
+        ToggleOSCWrapper tog = getActivity().getToggleWrappers().get(0);
+        assertEquals("Initially toggle on label should be set by config", "tog_on1", tog.getOnLabel());
+
+        final CountDownLatch signal = new CountDownLatch(1);
+
+        final Collection<Object> args = new ArrayList<Object>();
+        args.add("hello");
+        args.add("world");
+
+        mOscOut.send(new OSCMessage("/tog1/labelOn", args));
+        try {
+            signal.await(2, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        assertEquals("tog labelOn should be set by OSC", "hello world", tog.getOnLabel());
+    }
+
+    /**
+     * Testing /togN/labelOff
+     */
+    public void testSettingLabelOffWithOSC() throws IOException {
+        ToggleOSCWrapper tog = getActivity().getToggleWrappers().get(0);
+        assertEquals("Initially toggle off label should be set by config", "tog_off1", tog.getOffLabel());
+
+        final CountDownLatch signal = new CountDownLatch(1);
+
+        final Collection<Object> args = new ArrayList<Object>();
+        args.add("hello");
+        args.add("world");
+
+        mOscOut.send(new OSCMessage("/tog1/labelOff", args));
+        try {
+            signal.await(2, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        assertEquals("tog labelOff should be set by OSC", "hello world", tog.getOffLabel());
+    }
+
+    /**
+     * Testing /togN/msgToggledOn
+     */
+    public void testSettingToggledOnMsgWithOSC() throws IOException {
+        ToggleOSCWrapper tog = getActivity().getToggleWrappers().get(0);
+        assertEquals("Initially toggle msgToggledOn value should be set by config", "/tog1/1", tog.getMessageToggleOnRaw());
 
         final CountDownLatch signal = new CountDownLatch(1);
 
@@ -79,22 +126,22 @@ public class QuickOSCButtonOSCTesting extends ActivityUnitTestCase<QuickOSCActiv
         args.add("/hello");
         args.add("world");
 
-        mOscOut.send(new OSCMessage("/btn1/msgButtonPressed", args));
+        mOscOut.send(new OSCMessage("/tog1/msgToggledOn", args));
         try {
             signal.await(2, TimeUnit.SECONDS);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        assertEquals("btn should have a new btnPressed value", "/hello world", btn.getMessageButtonPressedRaw());
+        assertEquals("tog msgToggledOn value should be set by OSC", "/hello world", tog.getMessageToggleOnRaw());
     }
 
     /**
-     * Testing /btnN/msgButtonReleased
+     * Testing /togN/msgToggledOff
      */
-    public void testSettingMsgButtonReleasedValueWithOSC() throws IOException {
-        ButtonOSCWrapper btn = getActivity().getButtonWrappers().get(0);
-        assertEquals("btn msgButtonReleased should come from the config", "/btn1/rel1", btn.getMessageButtonReleasedRaw());
+    public void testSettingToggledOffMsgWithOSC() throws IOException {
+        ToggleOSCWrapper tog = getActivity().getToggleWrappers().get(0);
+        assertEquals("toggle msgToggledOff value should be set by config", "/tog1/0", tog.getMessageToggleOffRaw());
 
         final CountDownLatch signal = new CountDownLatch(1);
 
@@ -102,60 +149,13 @@ public class QuickOSCButtonOSCTesting extends ActivityUnitTestCase<QuickOSCActiv
         args.add("/hello");
         args.add("world");
 
-
-        mOscOut.send(new OSCMessage("/btn1/msgButtonReleased", args));
+        mOscOut.send(new OSCMessage("/tog1/msgToggledOff", args));
         try {
             signal.await(2, TimeUnit.SECONDS);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        assertEquals("new msgButtonReleased should come from OSC", "/hello world", btn.getMessageButtonReleasedRaw());
-    }
-
-    /**
-     * Testing /btnN/triggerOnButtonReleased 1
-     */
-    public void testSettingTriggerOnButtonReleaseValueWithOSC() {
-        ButtonOSCWrapper btn = getActivity().getButtonWrappers().get(0);
-        assertFalse("btn triggerOnButtonReleased should be false at first", btn.getTriggerWhenButtonReleased());
-
-        final CountDownLatch signal = new CountDownLatch(1);
-
-        final Collection<Object> args = new ArrayList<Object>();
-        args.add(1);
-
-        new AsyncSendOSCTask(getActivity(), QuickOSCButtonOSCTesting.this.mOscOut).execute(new OSCMessage("/btn1/triggerOnButtonReleased", args));
-        try {
-            signal.await(2, TimeUnit.SECONDS);
-        }
-        catch(Exception e) {
-            e.printStackTrace();
-        }
-
-        assertTrue("triggerOnButtonRelease should be true", btn.getTriggerWhenButtonReleased());
-    }
-
-    /**
-     * Testing /btnN/triggerOnButtonReleased 1
-     */
-    public void testSettingTriggerOnButtonReleaseValueWithInvalidOSC() {
-        ButtonOSCWrapper btn = getActivity().getButtonWrappers().get(0);
-        assertFalse("btn triggerOnButtonReleased should be false at first", btn.getTriggerWhenButtonReleased());
-
-        final CountDownLatch signal = new CountDownLatch(1);
-
-        final Collection<Object> args = new ArrayList<Object>();
-        args.add(4);
-
-        new AsyncSendOSCTask(getActivity(), QuickOSCButtonOSCTesting.this.mOscOut).execute(new OSCMessage("/btn1/triggerOnButtonReleased", args));
-        try {
-            signal.await(2, TimeUnit.SECONDS);
-        }
-        catch(Exception e) {
-            e.printStackTrace();
-        }
-
-        assertFalse("triggerOnButtonRelease should be false", btn.getTriggerWhenButtonReleased());
+        assertEquals("tog msgToggledOff value should be set by OSC", "/hello world", tog.getMessageToggleOffRaw());
     }
 }

@@ -17,16 +17,18 @@ import java.io.InputStream;
 public class QuickOSCMockContext extends RenamingDelegatingContext {
 
     private final static String OSC_SETTINGS_FILE = "qosc_osc.cfg";
+    private String mFixtureName;
 
     public QuickOSCMockContext(Context context) {
         super(context, "com.ahmetkizily.controls.osc");
+        this.mFixtureName = "osc_settings_fixture.txt";
     }
 
     @Override
     public FileInputStream openFileInput(String name) throws FileNotFoundException {
         if(name == OSC_SETTINGS_FILE) {
             try {
-                return new FixtureFromAssetsFileInputStream(getResources().getAssets().open("osc_settings_fixture.txt"));
+                return new FixtureFromAssetsFileInputStream(getResources().getAssets().open(this.mFixtureName));
             }
             catch(IOException io){
                 throw new FileNotFoundException("Unable to Open Fixture File");
@@ -34,6 +36,10 @@ public class QuickOSCMockContext extends RenamingDelegatingContext {
         }
 
         return super.openFileInput(name);
+    }
+
+    public void setFixtureName(String fixtureName) {
+        this.mFixtureName = fixtureName;
     }
 
     private class FixtureFromAssetsFileInputStream extends FileInputStream {

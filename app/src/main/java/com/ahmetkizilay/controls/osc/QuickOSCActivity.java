@@ -442,6 +442,10 @@ public class QuickOSCActivity extends FragmentActivity {
                     }
                     else if(arguments.get(0) instanceof Float) {
                         minValue = ((Float) arguments.get(0)).floatValue();
+
+                    }
+                    else if(arguments.get(0) instanceof Double) {
+                        minValue = ((Double) arguments.get(0)).floatValue();
                     }
                     else {
                         return;
@@ -452,6 +456,9 @@ public class QuickOSCActivity extends FragmentActivity {
                     }
                     else if(arguments.get(1) instanceof Float) {
                         maxValue = ((Float) arguments.get(1)).floatValue();
+                    }
+                    else if(arguments.get(1) instanceof Double) {
+                        maxValue = ((Double) arguments.get(1)).floatValue();
                     }
                     else {
                         return;

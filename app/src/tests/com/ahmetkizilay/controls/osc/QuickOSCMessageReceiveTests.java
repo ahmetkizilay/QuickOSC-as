@@ -70,8 +70,10 @@ public class QuickOSCMessageReceiveTests  extends ActivityInstrumentationTestCas
         final Collection<Object> args = new ArrayList<Object>();
         args.add("hello");
 
+        new AsyncSendOSCTask(getActivity(), QuickOSCMessageReceiveTests.this.mOscOut).execute(new OSCMessage("/btn1/label", args));
+
         try {
-            new AsyncSendOSCTask(getActivity(), QuickOSCMessageReceiveTests.this.mOscOut).execute(new OSCMessage("/btn1/label", args));
+
             signal.await(2, TimeUnit.SECONDS);
         } catch (Exception e) {
             e.printStackTrace();

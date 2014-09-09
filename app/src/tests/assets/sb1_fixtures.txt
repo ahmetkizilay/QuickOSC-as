@@ -1,0 +1,1 @@
+seekBar1-valcng#x#x#/sb1/trig/$#x#x#seekBar1-minval#x#x#25.0#x#x#seekBar1-maxval#x#x#50.0#x#x#
